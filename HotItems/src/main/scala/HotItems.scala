@@ -1,4 +1,6 @@
 
+import java.sql.Timestamp
+
 import org.apache.flink.api.common.functions.AggregateFunction
 import org.apache.flink.api.common.state.{ListState, ListStateDescriptor}
 import org.apache.flink.api.java.tuple.{Tuple, Tuple1}
@@ -11,6 +13,8 @@ import org.apache.flink.streaming.api.scala.function.WindowFunction
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
+
+import scala.collection.mutable.ListBuffer
 
 //input data
 case class UserBehavior(userId:Long, itemId:Long, categoryId: Int, behavior:String, timeStamp:Long)
@@ -39,6 +43,7 @@ object HotItems {
       .aggregate(new CountAgg(), new WindowResultFunction())
       .keyBy("windowEnd")
       .process(new TopNHot(3))
+      .print()
 
     environment.execute("hot item")
   }
@@ -80,8 +85,35 @@ object HotItems {
 
 
     override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[Tuple, ItemViewCount, String]#OnTimerContext, out: Collector[String]): Unit = {
-      var allItems:
-      
+      //get all goods Info
+      var allItems: ListBuffer[ItemViewCount] = ListBuffer()
+      import scala.collection.JavaConversions._
+      for(item <- itemState.get){
+        allItems += item
+      }
+
+      //clear all data, release space
+      itemState.clear()
+
+      //sort and take top N
+      val sortItem = allItems.sortBy(_.count)(Ordering.Long.reverse).take(topSize)
+
+      //format data
+      val res = new StringBuilder
+      res.append("=====================================\n")
+      res.append("Time: ").append(new Timestamp(timestamp - 1)).append("\n")
+
+      for (i <- sortItem.indices){
+        val it = sortItem(i)
+
+        res.append("No").append(i).append(":")
+          .append(" GoodsId=").append(it.itemId)
+          .append(" ViewCount=").append(it.count).append("\n")
+      }
+      res.append("=====================================\n\n")
+
+      Thread.sleep(1000)
+      out.collect(res.toString())
     }
   }
 
