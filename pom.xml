@@ -11,6 +11,7 @@
     <modules>
         <module>HotItems</module>
         <module>NetworkStatistics</module>
+        <module>LoginDetect</module>
     </modules>
 
 
