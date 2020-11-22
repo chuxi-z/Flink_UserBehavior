@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
 
 case class Login(userId: Long, ip: String, Type: String, time: Long)
 
-case class warningInfo(userId: Long, msg: String)
+case class warningInfo(userId: Long, code: Int, Type: String, msg: String)
 
 object loginDetect {
   def main(args: Array[String]): Unit = {
@@ -54,7 +54,7 @@ object loginDetect {
       state.clear()
 
       if(loginEvents.length >= 5){
-        val info = warningInfo(loginEvents.head.userId, "Exists danger behavior!!!")
+        val info = warningInfo(loginEvents.head.userId, 500, "error", "Exists danger behavior!!!")
         out.collect(info)
       }
     }
