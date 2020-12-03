@@ -30,7 +30,7 @@ object loginDetect {
     ))
       .assignAscendingTimestamps(_.time*1000)
       .filter(_.Type == "error")
-      .keyBy(_.userId) //classify by userid
+      .keyBy(_.userId) //classify by userId
       .process(new func())
       .print()
 

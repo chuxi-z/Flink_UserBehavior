@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="HotItems" />
         <module name="NetworkStatistics" />
+        <module name="OrderTimeout" />
         <module name="LoginDetect" />
       </profile>
     </annotationProcessing>
