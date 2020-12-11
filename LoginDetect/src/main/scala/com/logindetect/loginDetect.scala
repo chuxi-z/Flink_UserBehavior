@@ -54,7 +54,7 @@ object loginDetect {
       state.clear()
 
       if(loginEvents.length >= 5){
-        val info = warningInfo(loginEvents.head.userId, 500, "error", "Exists danger behavior!!!")
+        val info = warningInfo(loginEvents.head.userId, 1, "error", "Exists danger behavior!!!")
         out.collect(info)
       }
     }
